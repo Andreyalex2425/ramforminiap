@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Задание</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ответьте на задание</h2>
+  <form id="lessonForm">
+    <input type="hidden" name="telegram_id" id="telegram_id">
+
+    <label>Имя:</label>
+    <input type="text" name="name" required>
+
+    <label>Email:</label>
+    <input type="email" name="email" required>
+
+    <label>Ответ:</label>
+    <textarea name="answer" required></textarea>
+
+    <label>Загрузить файл:</label>
+    <input type="file" name="file" id="file" accept="*/*" required>
+
+    <button type="submit">Отправить</button>
+    <p id="result"></p>
+  </form>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    const telegramId = tg?.initDataUnsafe?.user?.id || "";
+    document.getElementById("telegram_id").value = telegramId;
+
+    document.getElementById("lessonForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const form = e.target;
+
+      const fileInput = document.getElementById("file");
+      const file = fileInput.files[0];
+      if (!file) return alert("Пожалуйста, выберите файл");
+
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const base64File = reader.result.split(",")[1]; // убираем префикс
+
+        const data = {
+          telegram_id: form.telegram_id.value,
+          name: form.name.value,
+          email: form.email.value,
+          answer: form.answer.value,
+          filename: file.name,
+          filetype: file.type,
+          filedata: base64File
+        };
+
+        try {
+          const res = await fetch("https://script.google.com/macros/s/AKfycbxf91NWplx5JJjMwd1Pb6eNahf-oQwdroP55Aa2s05rEY1N6tcOlma_jtAga5pzLhy08A/exec", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+
+          const result = await res.json();
+          if (result.result === "success") {
+            form.reset();
+            document.getElementById("result").textContent = "Успешно отправлено!";
+          } else {
+            document.getElementById("result").textContent = "Ошибка: " + JSON.stringify(result);
+          }
+        } catch (err) {
+          document.getElementById("result").textContent = "Ошибка при отправке файла.";
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
