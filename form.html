@@ -1,103 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Форма урока</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
-    }
-    input, textarea, button {
-      display: block;
-      width: 100%;
-      margin-bottom: 15px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      background-color: #2ea44f;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #278a44;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Форма обратной связи</title>
 </head>
 <body>
-  <h2>Ответьте на задание</h2>
-  <form id="lessonForm">
-    <input type="hidden" name="telegram_id" id="telegram_id">
+    <form id="feedbackForm">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" required><br><br>
 
-    <label>Имя:</label>
-    <input type="text" name="name" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
 
-    <label>Email:</label>
-    <input type="email" name="email" required>
+        <label for="message">Сообщение:</label>
+        <textarea id="message" name="message" required></textarea><br><br>
 
-    <label>Ответ:</label>
-    <textarea name="answer" required></textarea>
+        <button type="submit">Отправить</button>
+    </form>
 
-    <label>Загрузить файл:</label>
-    <input type="file" name="file" id="file" accept="*/*" required>
+    <script>
+        document.getElementById('feedbackForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
-    <button type="submit">Отправить</button>
-    <p id="result"></p>
-  </form>
+            var formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
 
-  <script>
-    const tg = window.Telegram?.WebApp;
-    const telegramId = tg?.initDataUnsafe?.user?.id || "";
-    document.getElementById("telegram_id").value = telegramId;
-
-    document.getElementById("lessonForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const form = e.target;
-
-      const fileInput = document.getElementById("file");
-      const file = fileInput.files[0];
-      if (!file) return alert("Пожалуйста, выберите файл.");
-
-      const reader = new FileReader();
-      reader.onload = async function () {
-        const base64File = reader.result.split(",")[1];
-
-        const formData = new FormData();
-        formData.append("telegram_id", form.telegram_id.value);
-        formData.append("name", form.name.value);
-        formData.append("email", form.email.value);
-        formData.append("answer", form.answer.value);
-        formData.append("filename", file.name);
-        formData.append("filetype", file.type);
-        formData.append("filedata", base64File);
-
-        try {
-          const res = await fetch("https://script.google.com/macros/s/AKfycbw6FWak8ObeLKLPi-apI7Abco7NWU7a0fHehE5DORT7Pe1GBLg4xwwPWAjqk3VKWT8AWw/exec", {
-            method: "POST",
-            body: formData
-          });
-
-          const result = await res.json();
-          if (result.result === "success") {
-            form.reset();
-            document.getElementById("result").textContent = "✅ Ответ успешно отправлен!";
-          } else {
-            document.getElementById("result").textContent = "❌ Ошибка: " + (result.message || "Неизвестная");
-          }
-        } catch (err) {
-          console.error("Ошибка при fetch:", err);
-          document.getElementById("result").textContent = "❌ Ошибка при отправке.";
-        }
-      };
-
-      reader.readAsDataURL(file);
-    });
-  </script>
+            fetch('https://script.google.com/macros/s/AKfycbyLT5xOHYRMvWOZhZLt6FxeRrIfBSinUk8EBCURkgnbXMoLwd9eOUxM5Ehw7oAXLd4gZw/exec', {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                document.getElementById('feedbackForm').reset();
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+        });
+    </script>
 </body>
 </html>
