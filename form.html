@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Форма урока</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -25,32 +25,59 @@
       border: none;
       cursor: pointer;
     }
+    #result {
+      font-size: 16px;
+      font-weight: bold;
+      color: green;
+      margin-top: 20px;
+    }
+    iframe {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <h2>Ответ на задание</h2>
-  <form method="POST" action="https://script.google.com/macros/s/AKfycbw0W2jOvn2cYeeP4JsUoa9jXNFF3ToOR-MGcaUKKzm0CmrGnrIcPm0kB1v1ZVpHiWCqmQ/exec" enctype="multipart/form-data">
-    <input type="hidden" name="telegram_id" id="telegram_id">
+
+  <form
+    id="lessonForm"
+    method="POST"
+    action="https://script.google.com/macros/s/AKfycbw0W2jOvn2cYeeP4JsUoa9jXNFF3ToOR-MGcaUKKzm0CmrGnrIcPm0kB1v1ZVpHiWCqmQ/exec"
+    enctype="multipart/form-data"
+    target="hidden_iframe"
+    onsubmit="handleSubmit();"
+  >
+    <input type="hidden" name="telegram_id" id="telegram_id" />
 
     <label>Имя:</label>
-    <input type="text" name="name" required>
+    <input type="text" name="name" required />
 
     <label>Email:</label>
-    <input type="email" name="email" required>
+    <input type="email" name="email" required />
 
     <label>Ответ:</label>
     <textarea name="answer" rows="4" required></textarea>
 
     <label>Файл (если есть):</label>
-    <input type="file" name="file" accept="*/*">
+    <input type="file" name="file" accept="*/*" />
 
     <button type="submit">Отправить</button>
   </form>
+
+  <iframe name="hidden_iframe" id="hidden_iframe"></iframe>
+
+  <p id="result"></p>
 
   <script>
     const tg = window.Telegram?.WebApp;
     const telegramId = tg?.initDataUnsafe?.user?.id || "";
     document.getElementById("telegram_id").value = telegramId;
+
+    function handleSubmit() {
+      const form = document.getElementById("lessonForm");
+      form.style.display = "none";
+      document.getElementById("result").textContent = "✅ Ответ успешно отправлен!";
+    }
   </script>
 </body>
 </html>
