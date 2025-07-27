@@ -52,7 +52,6 @@
   </form>
 
   <script>
-    // Получаем Telegram ID
     const tg = window.Telegram?.WebApp;
     const telegramId = tg?.initDataUnsafe?.user?.id || "";
     document.getElementById("telegram_id").value = telegramId;
@@ -80,7 +79,7 @@
         };
 
         try {
-          const res = await fetch("https://script.google.com/macros/s/AKfycbxKRZ6eTRKKpzaiM8OGHgrr_d5cDCnIpWNGgPfnpDeMRD4LuVxSCKzR3JTokXDdD0qhMg/exec", {
+          const res = await fetch("https://script.google.com/macros/s/AKfycbw6FWak8ObeLKLPi-apI7Abco7NWU7a0fHehE5DORT7Pe1GBLg4xwwPWAjqk3VKWT8AWw/exec", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
