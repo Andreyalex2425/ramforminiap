@@ -56,7 +56,7 @@
     const telegramId = tg?.initDataUnsafe?.user?.id || "";
     document.getElementById("telegram_id").value = telegramId;
 
-    document.getElementById("lessonForm").addEventListener("submit", async function (e) {
+    document.getElementById("lessonForm").addEventListener("submit", function (e) {
       e.preventDefault();
       const form = e.target;
 
@@ -66,23 +66,21 @@
 
       const reader = new FileReader();
       reader.onload = async function () {
-        const base64File = reader.result.split(",")[1]; // Удаляем "data:*/*;base64,"
+        const base64File = reader.result.split(",")[1];
 
-        const payload = {
-          telegram_id: form.telegram_id.value,
-          name: form.name.value,
-          email: form.email.value,
-          answer: form.answer.value,
-          filename: file.name,
-          filetype: file.type,
-          filedata: base64File
-        };
+        const formData = new FormData();
+        formData.append("telegram_id", form.telegram_id.value);
+        formData.append("name", form.name.value);
+        formData.append("email", form.email.value);
+        formData.append("answer", form.answer.value);
+        formData.append("filename", file.name);
+        formData.append("filetype", file.type);
+        formData.append("filedata", base64File);
 
         try {
           const res = await fetch("https://script.google.com/macros/s/AKfycbw6FWak8ObeLKLPi-apI7Abco7NWU7a0fHehE5DORT7Pe1GBLg4xwwPWAjqk3VKWT8AWw/exec", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: formData
           });
 
           const result = await res.json();
@@ -94,7 +92,7 @@
           }
         } catch (err) {
           console.error("Ошибка при fetch:", err);
-          document.getElementById("result").textContent = "❌ Ошибка при отправке файла.";
+          document.getElementById("result").textContent = "❌ Ошибка при отправке.";
         }
       };
 
