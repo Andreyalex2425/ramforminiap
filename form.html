@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Форма урока</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -33,21 +33,28 @@
   </style>
 </head>
 <body>
-  <h2>Ответ на задание (уже 5)</h2>
-  <form id="lessonForm" method="POST" enctype="multipart/form-data" action="https://script.google.com/macros/s/AKfycbxLI1X95xUHXDZG01DcVTzf7mYgiy2W2RJfchxvNWRzy2-CluI0oth4Fd7N3_GmCxRfsQ/exec" target="hidden_iframe">
-    <input type="hidden" name="telegram_id" id="telegram_id">
+  <h2>Ответ на задание (снова в миниапе)</h2>
+
+  <form
+    id="lessonForm"
+    method="POST"
+    enctype="multipart/form-data"
+    action="https://script.google.com/macros/s/AKfycbxLI1X95xUHXDZG01DcVTzf7mYgiy2W2RJfchxvNWRzy2-CluI0oth4Fd7N3_GmCxRfsQ/exec"
+    target="hidden_iframe"
+  >
+    <input type="hidden" name="telegram_id" id="telegram_id" />
 
     <label>Имя:</label>
-    <input type="text" name="name" required>
+    <input type="text" name="name" required />
 
     <label>Email:</label>
-    <input type="email" name="email" required>
+    <input type="email" name="email" required />
 
     <label>Ответ:</label>
     <textarea name="answer" rows="4" required></textarea>
 
     <label>Файл (если есть):</label>
-    <input type="file" name="file" accept="*/*">
+    <input type="file" name="file" accept="*/*" />
 
     <button type="submit">Отправить</button>
   </form>
@@ -57,10 +64,15 @@
   <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
   <script>
-    const tg = window.Telegram?.WebApp;
+    window.addEventListener("DOMContentLoaded", () => {
+      const tg = window.Telegram?.WebApp;
+      const userId = tg?.initDataUnsafe?.user?.id;
+      if (userId) {
+        document.getElementById("telegram_id").value = userId;
+      }
+    });
 
     document.getElementById("lessonForm").addEventListener("submit", function () {
-      document.getElementById("telegram_id").value = tg?.initDataUnsafe?.user?.id || "";
       setTimeout(() => {
         document.getElementById("lessonForm").reset();
         document.getElementById("success").style.display = "block";
