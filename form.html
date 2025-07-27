@@ -2,16 +2,31 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Задание</title>
+  <title>Форма урока</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
     input, textarea, button {
       display: block;
       width: 100%;
       margin-bottom: 15px;
       padding: 10px;
       font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #2ea44f;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #278a44;
     }
   </style>
 </head>
@@ -37,6 +52,7 @@
   </form>
 
   <script>
+    // Получаем Telegram ID
     const tg = window.Telegram?.WebApp;
     const telegramId = tg?.initDataUnsafe?.user?.id || "";
     document.getElementById("telegram_id").value = telegramId;
@@ -47,13 +63,13 @@
 
       const fileInput = document.getElementById("file");
       const file = fileInput.files[0];
-      if (!file) return alert("Пожалуйста, выберите файл");
+      if (!file) return alert("Пожалуйста, выберите файл.");
 
       const reader = new FileReader();
       reader.onload = async function () {
-        const base64File = reader.result.split(",")[1]; // убираем префикс
+        const base64File = reader.result.split(",")[1]; // Удаляем "data:*/*;base64,"
 
-        const data = {
+        const payload = {
           telegram_id: form.telegram_id.value,
           name: form.name.value,
           email: form.email.value,
@@ -64,21 +80,22 @@
         };
 
         try {
-          const res = await fetch("https://script.google.com/macros/s/AKfycbxf91NWplx5JJjMwd1Pb6eNahf-oQwdroP55Aa2s05rEY1N6tcOlma_jtAga5pzLhy08A/exec", {
+          const res = await fetch("https://script.google.com/macros/s/AKfycbxKRZ6eTRKKpzaiM8OGHgrr_d5cDCnIpWNGgPfnpDeMRD4LuVxSCKzR3JTokXDdD0qhMg/exec", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
           });
 
           const result = await res.json();
           if (result.result === "success") {
             form.reset();
-            document.getElementById("result").textContent = "Успешно отправлено!";
+            document.getElementById("result").textContent = "✅ Ответ успешно отправлен!";
           } else {
-            document.getElementById("result").textContent = "Ошибка: " + JSON.stringify(result);
+            document.getElementById("result").textContent = "❌ Ошибка: " + (result.message || "Неизвестная");
           }
         } catch (err) {
-          document.getElementById("result").textContent = "Ошибка при отправке файла.";
+          console.error("Ошибка при fetch:", err);
+          document.getElementById("result").textContent = "❌ Ошибка при отправке файла.";
         }
       };
 
